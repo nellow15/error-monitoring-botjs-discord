@@ -1,24 +1,28 @@
-const ERRORLOG = 'YOUR_CHANNEL_ID';
+const ShardoX_ErrorRoom = 'YOUR_CHANNEL_ID';
 
-function sendErrorLog(error) {
-    const channel = client.channels.cache.get(ERRORLOG);
-    if (!channel) return console.error('Channel not found');
+function ShardoXLog(err) {
+    if (!client) return;
 
-    const errorEmbed = new EmbedBuilder()
-        .setTitle('🚨 Error Detect')
-        .setDescription(`\`\`\`${error}\`\`\``)
-        .setColor('Red')
-        .setTimestamp();
-    
-    channel.send({ embeds: [errorEmbed] }).catch(console.error);
+    var shardoXCh = client.channels.cache.get(ShardoX_ErrorRoom);
+    if (!shardoXCh) return;
+
+    var shardoXMsg = err;
+    if (err && err.stack) shardoXMsg = err.stack;
+
+    const shardoXEmbed = new EmbedBuilder()
+        .setTitle('script error')
+        .setDescription('```' + shardoXMsg + '```')
+        .setColor(16711680);
+
+    shardoXCh.send({ embeds: [shardoXEmbed] });
 }
 
-process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
-    sendErrorLog(err.stack || err.message);
+process.on('uncaughtException', function (shardoXErr) {
+    console.log(shardoXErr);
+    ShardoXLog(shardoXErr);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection:', reason);
-    sendErrorLog(reason);
+process.on('unhandledRejection', function (shardoXErr) {
+    console.log(shardoXErr);
+    ShardoXLog(shardoXErr);
 });
